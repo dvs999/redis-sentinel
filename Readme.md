@@ -6,15 +6,7 @@ Change your redis config in config/database.php
 
 ```php
     'redis' => [
-
-        'client' => env('REDIS_CLIENT', 'phpredis_sentinel'),
-
-        'sentinel' => [
-            'hosts' => [
-                'localhost' => 26379,
-                'remote_host' => 'remote_port',
-            ],
-        ],
+        'client' => env('REDIS_CLIENT', 'phpredis'),
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
@@ -22,12 +14,18 @@ Change your redis config in config/database.php
         ],
 
         'default' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
+            'master' => 'mymaster',
+            'sentinel' => [
+                'hosts' => [
+                    '172.21.0.1' => 26379,
+                ],
+                'timeout' => 0,
+                'persistent' => null,
+                'retry_interval' => 0,
+                'read_timeout' => 0,
+            ],
         ],
-
     ],
 ```

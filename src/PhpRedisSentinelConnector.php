@@ -4,6 +4,7 @@
 namespace Dpsarr\LaravelRedisSentinel;
 
 
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use RedisException;
 
@@ -12,16 +13,16 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
     /**
      * @throws RedisException
      */
-    public function connect(array $config, array $options)
+    public function connect(array $config, array $options): PhpRedisConnection
     {
         if (!array_key_exists('sentinel', $config) || !is_array($config['sentinel'])) {
-            throw new \InvalidArgumentException('Redis Sentinel config was not found');
+            return parent::connect($config, $options);
         }
 
-        foreach ($config['sentinel'] as $item) {
+        foreach ($config['sentinel']['hosts'] as $host => $port) {
             $sentinel = new \RedisSentinel(
-                $item['host'],
-                $item['port'],
+                $host,
+                $port,
                 $item['timeout'] ?? 0,
                 $item['persistent'] ?? null,
                 $item['retry_interval'] ?? 0,
@@ -36,11 +37,11 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
                 }
 
                 $newConfig = [
-                    'host'     => $master['id'],
+                    'host'     => $master['ip'],
                     'port'     => $master['port'],
-                    'url'      => $config['url'],
-                    'password' => $config['password'],
-                    'database' => $config['database'],
+                    'url'      => $config['url'] ?? null,
+                    'password' => $config['password'] ?? null,
+                    'database' => $config['database'] ?? 0,
                 ];
 
                 return parent::connect($newConfig, $options);
