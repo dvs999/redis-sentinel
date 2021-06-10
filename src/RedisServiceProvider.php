@@ -17,10 +17,13 @@ class RedisServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('phpredis_sentinel', function ($app) {
+        $this->app->singleton('redis', function ($app) {
             $config = $app->make('config')->get('database.redis', []);
 
-            return new RedisManager($app, Arr::pull($config, 'client', 'phpredis'), $config);
+            $redisManager = new RedisManager($app, Arr::pull($config, 'client', 'phpredis'), $config);
+            $redisManager->extend('phpredis', function () {
+                return new PhpRedisSentinelConnector();
+            });
         });
 
         $this->app->bind('redis.connection', function ($app) {
