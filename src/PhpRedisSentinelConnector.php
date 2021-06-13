@@ -6,6 +6,7 @@ namespace Dpsarr\LaravelRedisSentinel;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
+use Illuminate\Support\Facades\Log;
 use RedisException;
 
 class PhpRedisSentinelConnector extends PhpRedisConnector
@@ -29,23 +30,25 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
                 $item['read_timeout'] ?? 0
             );
 
-            if ($sentinel !== null) {
-                $master = $sentinel->master($config['master'] ?? 'mymaster');
-
-                if (false === $master) {
-                    throw new \RuntimeException('Error detecting Redis master');
-                }
-
-                $newConfig = [
-                    'host'     => $master['ip'],
-                    'port'     => $master['port'],
-                    'url'      => $config['url'] ?? null,
-                    'password' => $config['password'] ?? null,
-                    'database' => $config['database'] ?? 0,
-                ];
-
-                return parent::connect($newConfig, $options);
+            if (!$sentinel->ping()) {
+                continue;
             }
+
+            $master = $sentinel->master($config['master'] ?? 'mymaster');
+
+            if (false === $master) {
+                throw new \RuntimeException('Error detecting Redis master');
+            }
+
+            $newConfig = [
+                'host'     => $master['ip'],
+                'port'     => $master['port'],
+                'url'      => $config['url'] ?? null,
+                'password' => $config['password'] ?? null,
+                'database' => $config['database'] ?? 0,
+            ];
+
+            return parent::connect($newConfig, $options);
         }
 
         throw new RedisException('Error connecting to Redis');
