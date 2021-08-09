@@ -16,10 +16,8 @@ class RedisServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->booting(function () {
-            Redis::extend('phpredis', function (){
-                return new PhpRedisSentinelConnector();
-            });
+        Redis::extend('phpredis', function () {
+            return new PhpRedisSentinelConnector();
         });
     }
 }
