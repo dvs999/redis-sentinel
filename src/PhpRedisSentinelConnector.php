@@ -25,17 +25,17 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
             $sentinel = new \RedisSentinel(
                 $host,
                 $port,
-                $item['timeout'] ?? 0,
-                $item['persistent'] ?? null,
-                $item['retry_interval'] ?? 0,
-                $item['read_timeout'] ?? 0
+                $config['sentinel']['timeout'] ?? 0,
+                $config['sentinel']['persistent'] ?? null,
+                $config['sentinel']['retry_interval'] ?? 0,
+                $config['sentinel']['read_timeout'] ?? 0
             );
 
             if (!$sentinel->ping()) {
                 continue;
             }
 
-            $master = $sentinel->master($config['master'] ?? 'mymaster');
+            $master = $sentinel->master($config['sentinel']['master'] ?? 'mymaster');
 
             if (false === $master) {
                 throw new \RuntimeException('Error detecting Redis master');
