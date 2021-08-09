@@ -20,15 +20,16 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
             return parent::connect($config, $options);
         }
 
-        foreach ($config['sentinel']['hosts'] as $host) {
+     foreach ($config['sentinel']['hosts'] as $host) {
             [$host,$port] = explode(':',$host);
             $sentinel = new \RedisSentinel(
                 $host,
-                $port,
-                $config['sentinel']['timeout'] ?? 0,
+                (int)$port,
+                (float)$config['sentinel']['timeout'] ?? 0,
                 $config['sentinel']['persistent'] ?? null,
                 $config['sentinel']['retry_interval'] ?? 0,
-                $config['sentinel']['read_timeout'] ?? 0
+                (float)($config['sentinel']['read_timeout'] ?? 0),
+                $config['password']
             );
 
             if (!$sentinel->ping()) {
