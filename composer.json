@@ -5,8 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "ext-redis": "*",
-        "laravel/laravel": "^8.0"
+        "ext-redis": "*"
     },
     "autoload": {
         "psr-4": {
