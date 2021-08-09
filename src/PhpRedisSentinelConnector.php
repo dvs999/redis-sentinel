@@ -20,7 +20,8 @@ class PhpRedisSentinelConnector extends PhpRedisConnector
             return parent::connect($config, $options);
         }
 
-        foreach ($config['sentinel']['hosts'] as $host => $port) {
+        foreach ($config['sentinel']['hosts'] as $host) {
+            [$host,$port] = explode(':',$host);
             $sentinel = new \RedisSentinel(
                 $host,
                 $port,
