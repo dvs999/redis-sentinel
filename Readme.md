@@ -5,27 +5,25 @@ Allows to connect to Redis via Redis Sentinel
 Change your redis config in config/database.php
 
 ```php
-    'redis' => [
+      'redis' => [
         'client' => env('REDIS_CLIENT', 'phpredis'),
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
         ],
 
         'default' => [
-            'password' => env('REDIS_PASSWORD', null),
-            'database' => env('REDIS_DB', '0'),
-            'master' => 'mymaster',
+            'password' => env('REDIS_AUTH', ''),
+            'database' => env('REDIS_DB', 0),
             'sentinel' => [
-                'hosts' => [
-                    '172.21.0.1' => 26379,
-                ],
-                'timeout' => 0,
-                'persistent' => null,
-                'retry_interval' => 0,
-                'read_timeout' => 0,
+                'hosts' => explode(',', env('REDIS_SENTINEL_HOSTS')),
+                'timeout' => '0.5',
+                'master' => env('REDIS_SENTINEL_MASTER_NAME', 'mymaster'),
+
+                'read_timeout' => (float)env('REDIS_SENTINEL_READ_TIMEOUT', '0'),
+                'retry_interval' => (int)env('REDIS_SENTINEL_RETRY_INTERVAL', '0'),
+                'persistent' => env('REDIS_SENTINEL_PERSIST', null),
             ],
+            'serializer' => 'igbinary'
         ],
-    ],
 ```
